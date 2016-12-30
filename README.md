@@ -4,10 +4,16 @@ Render recursive components, wire up callbacks, store selections in an appropria
 
 ### Problem
 
-Given a collection of trees, where each tree is comprised of alternating node types (`[items]` -> `[groups]` -> `[items]` -> `[groups]` -> `[items]`), of arbitrary depth, and where leaf nodes are all of type `item`, we want to 
+Given a collection of trees of arbitrary depth, where each tree is comprised of alternating node types and where all leaf nodes are of type `item` e.g.
 
-1. ~~represent this in an interative UI
-    - selecting the root item will show its groups (if it has any), and so on all the way down~~
+```
+[items] -> [groups] -> [items] -> [groups] -> [items]
+```
+
+we want to 
+
+1. ~~represent this in an interactive UI~~
+    - ~~selecting the root item will show its groups (if it has any), and so on all the way down~~
 2. ~~capture the path taken to a particular leaf node when it is selected~~
 3. capture all the selected leaf nodes, and their paths, in a suitable data structure
     - duplicate selections are permitted, and need to be aggregated
