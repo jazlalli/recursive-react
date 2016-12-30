@@ -20,7 +20,7 @@ export default class Group extends Component {
   }
 
   render() {
-    const { group } = this.props;
+    const { group, basketItem } = this.props;
     const { showItems } = this.state;
 
     let items = [];
@@ -34,15 +34,17 @@ export default class Group extends Component {
           key={item.id}
           item={item}
           leaf={(item.modifier_groups.length === 0)}
-          selectedId={`${this.props.selectedId}:${item.id}`}
+          basketItem={basketItem}
+          selectedId={`${this.props.selectedId}-${item.id}`}
           onSelected={this.props.onSelected}
         />
       ));
 
     const style = {
-      color: 'palevioletred',
-      marginLeft: '20px',
-      textDecoration: showItems ? 'underline' : 'none',
+      margin: '5px 0 5px 20px',
+      padding: '10px',
+      fontWeight: 'normal',
+      textDecoration: 'underline'
     };
 
     return (

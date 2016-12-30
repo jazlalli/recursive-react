@@ -1,9 +1,33 @@
 import React, { Component } from 'react';
+import Modal from 'react-modal';
 import Group from './Group';
+
+const itemStyle = {
+  position: 'relative',
+  margin: '5px 0',
+  padding: '10px',
+  border: '1px solid',
+  borderRadius: '3px',
+  fontWeight: 'bold',
+  color: '#555',
+  textDecoration: 'none'
+};
+
+const buttonStyle = {
+  margin: '20px',
+  width: '120px',
+  height: '42px',
+  fontSize: '16px',
+  border: 'none',
+  borderRadius: 0,
+  background: 'teal',
+  color: 'white'
+};
 
 class Item extends Component {
   constructor(props) {
     super(props);
+    this.closeModal = this.closeModal.bind(this);
     this.handleClick = this.handleClick.bind(this);
     this.state = {
       showGroup: false,
@@ -11,24 +35,45 @@ class Item extends Component {
     };
   }
 
+  closeModal = evt => {
+    this.setState({
+      showGroup: false,
+    }, () => {
+      this.props.onSelected(this.props.basketItem);
+    });
+  }
+
   handleClick = evt => {
     evt.preventDefault();
     evt.stopPropagation();
 
-    const { leaf, onSelected, selectedId } = this.props;
+    const {
+      root,
+      leaf,
+      selectedId,
+      basketItem,
+    } = this.props;
+
+    const {
+      quantity,
+    } = this.state;
 
     this.setState({
       showGroup: !this.state.showGroup,
-      quantity: this.state.quantity + 1,
+      quantity: quantity + 1,
     }, () => {
-      if (leaf) {
-        onSelected(selectedId, this.state.quantity);
+      if (root || leaf) {
+        basketItem[String(selectedId)] = this.state.quantity;
+      }
+
+      if (root && leaf) {
+        this.props.onSelected(this.props.basketItem);
       }
     });
   }
 
   render() {
-    const { item, leaf } = this.props;
+    const { item, root, leaf, basketItem } = this.props;
     const { showGroup, quantity } = this.state;
 
     let groups = [];
@@ -41,28 +86,51 @@ class Item extends Component {
         <Group
           key={group.id}
           group={group}
-          selectedId={`${this.props.selectedId}:${group.id}`}
+          basketItem={basketItem}
+          selectedId={`${this.props.selectedId}-${group.id}`}
           onSelected={this.props.onSelected}
         />
       ));
 
-    const style = {
-      color: 'green',
-      marginLeft: top ? 0 : '20px',
-      textDecoration: (leaf || quantity) ? 'underline' : 'none',
-    };
+    const style = Object.assign({}, itemStyle, {
+      borderColor: quantity > 0 ? 'palevioletred' : '#c0c0c0'
+    });
 
-    const name = top ? item.name : `> ${item.name}`;
+    const children = (
+      <span>
+        {(displayGroups.length > 0 && showGroup) && displayGroups}
+      </span>
+    );
 
     return (
       <div
         style={style}
         onClick={this.handleClick}
       >
-        { name }
-        <span>
-          {(displayGroups.length > 0 && showGroup) && displayGroups}
-        </span>
+        { `${(leaf && quantity > 0) ? quantity+'x' : '' } ${item.name}` }
+        <div style={{
+          fontSize: '11px',
+          fontWeight: '200'
+        }}>{item.description}</div>
+
+        {root && displayGroups.length > 0
+          ? (
+            <Modal
+              shouldCloseOnOverlayClick
+              isOpen={showGroup}
+              contentLabel={item.name}
+              onRequestClose={this.closeModal}
+            >
+              {children}
+              <button
+                style={buttonStyle}
+                onClick={this.closeModal}
+              >
+                Confirm
+              </button>
+            </Modal>
+          )
+          : children}
       </div>
     );
   }
